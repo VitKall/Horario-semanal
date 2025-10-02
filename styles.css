@@ -186,8 +186,8 @@ li {
     }
 }
 
-@media (min-width: 900px) {
+/* @media (min-width: 900px) {
     ul {
         column-count: 3;
-    }
+    } */
 }
