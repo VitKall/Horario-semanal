@@ -6,82 +6,89 @@
     <title>Horario de servicio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
     <header>
-        <h1>HORARIO SEMANAL</h1>
-    </header>    
+        <div class="header-top">
+            <h1 id="titulo-horario">Mi semana | <span id="mes-actual"></span></h1>
+            <div class="menu-hamburguesa" onclick="toggleMenuOpciones()">
+                <div></div><div></div><div></div>
+            </div>
+            <div id="menu-opciones" class="menu-opciones">
+                <div class="menu-item" onclick="toggleSubmenu('submenu-copia')">Copia de seguridad ▼</div>
+                <div id="submenu-copia" class="submenu">
+                    <button class="btn" onclick="exportarDatos()">Hacer copia</button>
+                    <input type="file" id="importarArchivo" style="display:none" onchange="importarDatos(event)">
+                    <button class="btn" onclick="document.getElementById('importarArchivo').click()">Restaurar</button>
+                </div>
+                <div class="menu-item" onclick="toggleSubmenu('submenu-meta')">Mi meta ▼</div>
+                <div id="submenu-meta" class="submenu">
+                    <div id="meta-form"></div>
+                </div>
+                <div class="menu-item" onclick="toggleModoOscuro()">Modo oscuro/Claro</div>
+                <div class="menu-item" onclick="nuevoMes()">Nuevo mes</div>
+            </div>
+        </div>
+        <div id="resumen-mes" class="total-tiempo"></div>
+        <div id="total-semanal" class="total-tiempo"></div>
+    </header>
 
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-lunes')" style="cursor:pointer;">Lunes</h2>
-            <ul id="info-lunes" style="display:none;">
-                <li><span>6:45 pm</span> | Doramas</li>
-            </ul>
+            <ul id="info-lunes" style="display:none;"></ul>
+            <button class="btn btn-add" onclick="abrirMenuAgregar('info-lunes')">+</button>
+            <div class="total-tiempo" id="total-info-lunes"></div>
         </div>
     </section>
-
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-martes')" style="cursor:pointer;">Martes</h2>
-            <ul id="info-martes" style="display:none;">
-                <li><span>3:45 pm</span> | Exhibidor > <span class="color-katy">Katy</span></li>
-                <li><span>4:15 pm</span> | A. Velandia > <span class="color-ricky">Ricky</span></li>
-                <li><span>Visitas</span> | Entre 6 y 6:45 pm</li>
-                <li><span>6:45 pm</span> | M. Galán</li>
-            </ul>
+            <ul id="info-martes" style="display:none;"></ul>
+            <button class="btn btn-add" onclick="abrirMenuAgregar('info-martes')">+</button>
+            <div class="total-tiempo" id="total-info-martes"></div>
         </div>
     </section>
-
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-miercoles')" style="cursor:pointer;">Miércoles</h2>
-            <ul id="info-miercoles" style="display:none;">
-                <li><span>6:00 am</span> | SABAQ > <span class="color-katy">Katy</span></li>
-                <li><span>4:15 pm</span> | J. Rochel</li>
-                <li><span>7:15 pm</span> | Adorarión en familia</li>
-            </ul>
+            <ul id="info-miercoles" style="display:none;"></ul>
+            <button class="btn btn-add" onclick="abrirMenuAgregar('info-miercoles')">+</button>
+            <div class="total-tiempo" id="total-info-miercoles"></div>
         </div>
     </section>
-
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-jueves')" style="cursor:pointer;">Jueves</h2>
-            <ul id="info-jueves" style="display:none;">
-                <li><span>6:45 am</span> | Exhibidor</li>
-            </ul>
+            <ul id="info-jueves" style="display:none;"></ul>
+            <button class="btn btn-add" onclick="abrirMenuAgregar('info-jueves')">+</button>
+            <div class="total-tiempo" id="total-info-jueves"></div>
         </div>
     </section>
-
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-viernes')" style="cursor:pointer;">Viernes</h2>
-            <ul id="info-viernes" style="display:none;">
-                <li><span>8:15 pm</span> | M. Peralta</li>
-                <li><span>4:15 pm</span> | E. Tapia</li>
-                <li><span>7:45 pm</span> | Dorama</li>
-            </ul>
+            <ul id="info-viernes" style="display:none;"></ul>
+            <button class="btn btn-add" onclick="abrirMenuAgregar('info-viernes')">+</button>
+            <div class="total-tiempo" id="total-info-viernes"></div>
         </div>
     </section>
-
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-sabado')" style="cursor:pointer;">Sábado</h2>
-            <ul id="info-sabado" style="display:none;">
-                <li><span>8:45 pm</span> | ¿Salón del Reino? > <span class="color-enfasis">Preguntar</span></li>
-            </ul>
+            <ul id="info-sabado" style="display:none;"></ul>
+            <button class="btn btn-add" onclick="abrirMenuAgregar('info-sabado')">+</button>
+            <div class="total-tiempo" id="total-info-sabado"></div>
         </div>
     </section>
-
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-domingo')" style="cursor:pointer;">Domingo</h2>
-            <ul id="info-domingo" style="display:none;">
-                <li><span>8:45 am</span> | <span class="color-enfasis">Preguntar</span></li>
-            </ul>
+            <ul id="info-domingo" style="display:none;"></ul>
+            <button class="btn btn-add" onclick="abrirMenuAgregar('info-domingo')">+</button>
+            <div class="total-tiempo" id="total-info-domingo"></div>
         </div>
     </section>
-    
-<script src="script.js"></script>
+    <div id="modal-agregar" class="modal"></div>
+    <script src="script.js"></script>
 </body>
 </html>
