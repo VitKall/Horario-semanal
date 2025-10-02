@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Horario de servicio</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>HORARIO SEMANAL</h1>
+    </header>    
+
+    <section>
+        <div>
+            <h2 onclick="mostrarOcultar('info-lunes')" style="cursor:pointer;">Lunes</h2>
+            <ul id="info-lunes" style="display:none;">
+                <li><span>6:45 pm</span> | Doramas</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div>
+            <h2 onclick="mostrarOcultar('info-martes')" style="cursor:pointer;">Martes</h2>
+            <ul id="info-martes" style="display:none;">
+                <li><span>3:45 pm</span> | Exhibidor > <span class="color-katy">Katy</span></li>
+                <li><span>4:15 pm</span> | A. Velandia > <span class="color-ricky">Ricky</span></li>
+                <li><span>Visitas</span> | Entre 6 y 6:45 pm</li>
+                <li><span>6:45 pm</span> | M. Galán</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div>
+            <h2 onclick="mostrarOcultar('info-miercoles')" style="cursor:pointer;">Miércoles</h2>
+            <ul id="info-miercoles" style="display:none;">
+                <li><span>6:00 am</span> | SABAQ > <span class="color-katy">Katy</span></li>
+                <li><span>4:15 pm</span> | J. Rochel</li>
+                <li><span>7:15 pm</span> | Adorarión en familia</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div>
+            <h2 onclick="mostrarOcultar('info-jueves')" style="cursor:pointer;">Jueves</h2>
+            <ul id="info-jueves" style="display:none;">
+                <li><span>6:45 am</span> | Exhibidor</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div>
+            <h2 onclick="mostrarOcultar('info-viernes')" style="cursor:pointer;">Viernes</h2>
+            <ul id="info-viernes" style="display:none;">
+                <li><span>8:15 pm</span> | M. Peralta</li>
+                <li><span>4:15 pm</span> | E. Tapia</li>
+                <li><span>7:45 pm</span> | Dorama</li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div>
+            <h2 onclick="mostrarOcultar('info-sabado')" style="cursor:pointer;">Sábado</h2>
+            <ul id="info-sabado" style="display:none;">
+                <li><span>8:45 pm</span> | ¿Salón del Reino? > <span class="color-enfasis">Preguntar</span></li>
+            </ul>
+        </div>
+    </section>
+
+    <section>
+        <div>
+            <h2 onclick="mostrarOcultar('info-domingo')" style="cursor:pointer;">Domingo</h2>
+            <ul id="info-domingo" style="display:none;">
+                <li><span>8:45 am</span> | <span class="color-enfasis">Preguntar</span></li>
+            </ul>
+        </div>
+    </section>
+    
+<script src="script.js"></script>
+</body>
+</html>
