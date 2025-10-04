@@ -7,31 +7,42 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Encabezado principal -->
     <header>
         <div class="header-top">
             <h1 id="titulo-horario">Mi semana | <span id="mes-actual"></span></h1>
+            <!-- Botón menú hamburguesa -->
             <div class="menu-hamburguesa" onclick="toggleMenuOpciones()">
                 <div></div><div></div><div></div>
             </div>
+            <!-- Menú desplegable -->
             <div id="menu-opciones" class="menu-opciones">
                 <div class="menu-item" onclick="toggleSubmenu('submenu-copia')">Copia de seguridad ▼</div>
                 <div id="submenu-copia" class="submenu">
-                    <button class="btn" onclick="exportarDatos()">Hacer copia</button>
+                    <button class="btn" onclick="exportarDatos()">Copia de seguridad</button>
                     <input type="file" id="importarArchivo" style="display:none" onchange="importarDatos(event)">
                     <button class="btn" onclick="document.getElementById('importarArchivo').click()">Restaurar</button>
+                    <button class="btn" onclick="cerrarMenuOpciones()">Cerrar</button>
                 </div>
-                <div class="menu-item" onclick="toggleSubmenu('submenu-meta')">Mi meta ▼</div>
+                <div class="menu-item" onclick="toggleSubmenu('submenu-meta')">Mi meta del mes ▼</div>
                 <div id="submenu-meta" class="submenu">
                     <div id="meta-form"></div>
+                    <button class="btn" onclick="cerrarMenuOpciones()">Cerrar</button>
                 </div>
                 <div class="menu-item" onclick="toggleModoOscuro()">Modo oscuro/Claro</div>
-                <div class="menu-item" onclick="nuevoMes()">Nuevo mes</div>
+                <div class="menu-item" onclick="abrirInforme()">Generar informe</div>
+                <div class="menu-item" onclick="cerrarMenuOpciones()">Cerrar menú</div>
             </div>
         </div>
-        <div id="resumen-mes" class="total-tiempo"></div>
+        <!-- Resumen alineado a la izquierda -->
+        <div id="resumen-mes" class="total-tiempo resumen-izq"></div>
+        <!-- Botón "Actualizar hrs" alineado a la derecha -->
+        <div class="actualizar-hrs-container">
+            <button class="actualizar-hrs-btn" onclick="abrirFormularioActualizarHrs()">Actualizar<br>hrs</button>
+        </div>
         <div id="total-semanal" class="total-tiempo"></div>
     </header>
-
+    <!-- Secciones de días de la semana -->
     <section>
         <div>
             <h2 onclick="mostrarOcultar('info-lunes')" style="cursor:pointer;">Lunes</h2>
@@ -88,6 +99,7 @@
             <div class="total-tiempo" id="total-info-domingo"></div>
         </div>
     </section>
+    <!-- Modal para formularios y mensajes -->
     <div id="modal-agregar" class="modal"></div>
     <script src="script.js"></script>
 </body>
