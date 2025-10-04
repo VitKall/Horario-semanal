@@ -1,9 +1,10 @@
-// Utilidades de fecha y mes
+// --- Variables globales y utilidades de fecha/mes ---
 const MESES = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+// Devuelve el mes actual en texto
 function getMesActual() {
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
     if (datos.mes) return datos.mes;
@@ -11,6 +12,7 @@ function getMesActual() {
     return MESES[fecha.getMonth()];
 }
 
+// Establece el mes actual en los datos del usuario
 function setMesActual(mes) {
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
     datos.mes = mes;
@@ -18,60 +20,103 @@ function setMesActual(mes) {
     localStorage.setItem('datos_usuario', JSON.stringify(datos));
 }
 
+// Muestra el mes actual en el encabezado
 function mostrarMesActual() {
     document.getElementById('mes-actual').textContent = getMesActual();
 }
 
 // --- Menú hamburguesa y submenús ---
+// Abre/cierra el menú de opciones
 function toggleMenuOpciones() {
     document.getElementById('menu-opciones').classList.toggle('abierto');
 }
+// Abre/cierra un submenú específico
 function toggleSubmenu(id) {
     document.getElementById(id).classList.toggle('abierto');
     if(id === 'submenu-meta') renderMetaForm();
 }
+// Cierra el menú de opciones
+function cerrarMenuOpciones() {
+    document.getElementById('menu-opciones').classList.remove('abierto');
+    document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('abierto'));
+}
 
 // --- Modo oscuro/claro ---
+// Cambia entre modo oscuro y claro
 function toggleModoOscuro() {
     document.body.classList.toggle('modo-claro');
     localStorage.setItem('modo_claro', document.body.classList.contains('modo-claro'));
 }
 
 // --- Meta y nombre ---
+// Renderiza el formulario de meta y nombre en el menú
 function renderMetaForm() {
     const metaDiv = document.getElementById('meta-form');
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
     metaDiv.innerHTML = '';
+    // Si no hay nombre, muestra formulario para nombre y apellido
     if (!datos.nombre) {
         metaDiv.innerHTML = `
-            <input type="text" id="input-nombre" placeholder="Introduce tu nombre">
+            <input type="text" id="input-nombre" placeholder="Nombre">
+            <input type="text" id="input-apellido" placeholder="Apellido (opcional)">
             <button class="btn" onclick="guardarNombreMeta()">Guardar</button>
         `;
-    } else if (!datos.tipo_meta) {
-        metaDiv.innerHTML = `
-            <div>Hola, ${datos.nombre}. Selecciona tu meta:</div>
-            <button class="btn" onclick="setMetaTipo('regular')">P. Regular (50h)</button>
-            <button class="btn" onclick="mostrarAuxiliar()">P. Auxiliar</button>
-            <button class="btn" onclick="mostrarPersonal()">Mi meta personal</button>
-            <div id="auxiliar-opciones" style="margin-top:0.5rem;"></div>
-            <div id="personal-opciones" style="margin-top:0.5rem;"></div>
-        `;
     } else {
+        // Si hay nombre, muestra datos y opciones para editar
         metaDiv.innerHTML = `
-            <div>Nombre: ${datos.nombre}</div>
-            <div>Meta: ${datos.meta} horas (${mostrarTipoMeta(datos.tipo_meta)})</div>
-            <button class="btn" onclick="resetMeta()">Cambiar meta</button>
+            <div>Usuario: ${datos.nombre}${datos.apellido ? ' ' + datos.apellido : ''}</div>
+            <button class="btn" onclick="editarNombreMeta()">Editar nombre</button>
+            <div style="margin-top:1rem;">
+                <div>Meta mensual: ${datos.meta ? datos.meta + ' horas (' + mostrarTipoMeta(datos.tipo_meta) + ')' : 'No configurada'}</div>
+                <button class="btn" onclick="mostrarOpcionesMeta()">Cambiar meta</button>
+            </div>
         `;
+        // Si está editando meta, muestra opciones
+        if (metaDiv.dataset.editMeta === "true") {
+            metaDiv.innerHTML += `
+                <div style="margin-top:1rem;">
+                    <button class="btn" onclick="setMetaTipo('regular')">P. Regular (50h)</button>
+                    <button class="btn" onclick="mostrarAuxiliar()">P. Auxiliar</button>
+                    <button class="btn" onclick="mostrarPersonal()">Mi meta personal</button>
+                    <div id="auxiliar-opciones" style="margin-top:0.5rem;"></div>
+                    <div id="personal-opciones" style="margin-top:0.5rem;"></div>
+                </div>
+            `;
+        }
     }
 }
+
+// Guarda el nombre y apellido del usuario
 function guardarNombreMeta() {
     const nombre = document.getElementById('input-nombre').value.trim();
+    const apellido = document.getElementById('input-apellido').value.trim();
     if (!nombre) return alert("Por favor, ingresa tu nombre.");
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
     datos.nombre = nombre;
+    datos.apellido = apellido;
     localStorage.setItem('datos_usuario', JSON.stringify(datos));
     renderMetaForm();
 }
+
+// Permite editar el nombre y apellido
+function editarNombreMeta() {
+    const metaDiv = document.getElementById('meta-form');
+    const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
+    metaDiv.innerHTML = `
+        <input type="text" id="input-nombre" value="${datos.nombre}" placeholder="Nombre">
+        <input type="text" id="input-apellido" value="${datos.apellido || ''}" placeholder="Apellido (opcional)">
+        <button class="btn" onclick="guardarNombreMeta()">Guardar</button>
+    `;
+}
+
+// Muestra las opciones para cambiar la meta
+function mostrarOpcionesMeta() {
+    const metaDiv = document.getElementById('meta-form');
+    metaDiv.dataset.editMeta = "true";
+    renderMetaForm();
+}
+
+// Establece el tipo de meta y valor
 function setMetaTipo(tipo, valor) {
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
     datos.tipo_meta = tipo;
@@ -81,34 +126,35 @@ function setMetaTipo(tipo, valor) {
     datos.mes = getMesActual();
     if (!datos.fecha_inicio) datos.fecha_inicio = new Date().toISOString();
     localStorage.setItem('datos_usuario', JSON.stringify(datos));
+    document.getElementById('meta-form').dataset.editMeta = "false";
     renderMetaForm();
     mostrarResumenMes();
 }
+
+// Muestra las opciones de meta auxiliar
 function mostrarAuxiliar() {
     document.getElementById('auxiliar-opciones').innerHTML = `
         <button class="btn" onclick="setMetaTipo('auxiliar',30)">30 horas</button>
         <button class="btn" onclick="setMetaTipo('auxiliar',15)">15 horas</button>
     `;
 }
+
+// Muestra el campo para meta personal
 function mostrarPersonal() {
     document.getElementById('personal-opciones').innerHTML = `
-        <input type="number" id="input-meta-personal" placeholder="Horas">
+        <input type="number" id="input-meta-personal" placeholder="Horas (máx 99)" min="1" max="99">
         <button class="btn" onclick="guardarMetaPersonal()">Guardar</button>
     `;
 }
+
+// Guarda la meta personal ingresada
 function guardarMetaPersonal() {
     const valor = parseFloat(document.getElementById('input-meta-personal').value);
-    if (!valor || valor < 1) return alert("Ingresa una meta válida.");
+    if (!valor || valor < 1 || valor > 99) return alert("Ingresa una meta válida (1-99).");
     setMetaTipo('personal', valor);
 }
-function resetMeta() {
-    const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-    delete datos.tipo_meta;
-    delete datos.meta;
-    localStorage.setItem('datos_usuario', JSON.stringify(datos));
-    renderMetaForm();
-    mostrarResumenMes();
-}
+
+// Devuelve el texto del tipo de meta
 function mostrarTipoMeta(tipo) {
     if (tipo === 'regular') return 'P. Regular';
     if (tipo === 'auxiliar') return 'P. Auxiliar';
@@ -117,29 +163,53 @@ function mostrarTipoMeta(tipo) {
 }
 
 // --- Resumen de meta y progreso ---
+// Muestra el resumen alineado a la izquierda
 function mostrarResumenMes() {
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
     const meta = datos.meta || 0;
     const nombre = datos.nombre || '';
-    const tipo = datos.tipo_meta || '';
-    const total = calcularTotalSemana();
-    let faltan = meta * 60 - total;
-    let texto = '';
+    const apellido = datos.apellido || '';
+    // Suma de horas de actividades de servicio (meta semanal)
+    let totalServicioHoras = 0;
+    document.querySelectorAll('ul').forEach(ul => {
+        ul.querySelectorAll('li.servicio').forEach(li => {
+            const horas = parseFloat(li.getAttribute('data-horas') || '0');
+            totalServicioHoras += horas;
+        });
+    });
+    // Suma de horas ingresadas en "Actualizar hrs"
+    let totalActualizadoHoras = parseFloat(localStorage.getItem('actualizar_hrs') || '0');
+    // Mensaje según progreso
+    let faltan = meta - totalActualizadoHoras;
+    let progreso = '';
     if (meta > 0) {
-        if (faltan > 0) {
-            texto = `${nombre}, así vas:<br>Tu meta: ${meta}h<br><span style="font-size:1em;">Faltan: ${formatearTiempo(faltan)}</span>`;
+        if (totalActualizadoHoras <= 0) {
+            progreso = `Empecemos: 0h`;
+        } else if (faltan > 0) {
+            progreso = `¡Vamos! Solo faltan: ${faltan}h`;
+        } else if (faltan === 0) {
+            progreso = `¡Lo hiciste!`;
         } else {
-            texto = `${nombre}, así vas:<br> meta: ${meta}h<br><span style="font-size:1.1em;">¡Superaste la meta por +${formatearTiempo(-faltan)}!</span>`;
+            progreso = `¡Superaste tu meta por ${Math.abs(faltan)}h!`;
         }
     }
-    document.getElementById('resumen-mes').innerHTML = texto;
+    // Renderiza el resumen alineado a la izquierda
+    document.getElementById('resumen-mes').innerHTML = `
+        ${nombre}${apellido ? ' ' + apellido : ''}, así vas:<br>
+        Meta mensual: ${meta > 0 ? meta + 'h' : 'Establece tu meta'}<br>
+        Meta semanal: ${totalServicioHoras}h<br>
+        ${progreso}
+    `;
+    // Actualiza el total semanal a la derecha
+    // document.getElementById('total-semanal').textContent = totalServicioHoras > 0 ? `Total semanal: ${totalServicioHoras}h` : '';
 }
 
 // --- Copia de seguridad ---
+// Exporta los datos del usuario y actividades
 function exportarDatos() {
     const datos = {};
     Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('actividades_') || key === 'datos_usuario') {
+        if (key.startsWith('actividades_') || key === 'datos_usuario' || key === 'actualizar_hrs') {
             datos[key] = localStorage.getItem(key);
         }
     });
@@ -152,6 +222,7 @@ function exportarDatos() {
     URL.revokeObjectURL(url);
 }
 
+// Importa los datos desde un archivo
 function importarDatos(event) {
     const archivo = event.target.files[0];
     if (!archivo) return;
@@ -171,6 +242,7 @@ function importarDatos(event) {
 }
 
 // --- Mostrar/Ocultar actividades ---
+// Muestra u oculta la lista de actividades de un día
 function mostrarOcultar(id) {
     const elemento = document.getElementById(id);
     if (elemento.style.display === "none") {
@@ -180,327 +252,421 @@ function mostrarOcultar(id) {
     }
 }
 
-// --- Guardar y cargar actividades ---
-function guardarActividades() {
-    document.querySelectorAll('ul').forEach(ul => {
-        const id = ul.id;
-        const actividades = [];
-        ul.querySelectorAll('li').forEach(li => {
-            actividades.push(li.outerHTML);
-        });
-        localStorage.setItem('actividades_' + id, JSON.stringify(actividades));
-    });
-    calcularTotales();
-    mostrarResumenMes();
-}
+// // --- Guardar y cargar actividades ---
+// // Guarda todas las actividades en localStorage
+// function guardarActividades() {
+//     document.querySelectorAll('ul').forEach(ul => {
+//         const id = ul.id;
+//         const actividades = [];
+//         ul.querySelectorAll('li').forEach(li => {
+//             actividades.push(li.outerHTML);
+//         });
+//         localStorage.setItem('actividades_' + id, JSON.stringify(actividades));
+//     });
+//     mostrarResumenMes();
+// }
 
+// // Carga todas las actividades desde localStorage
+// function cargarActividades() {
+//     document.querySelectorAll('ul').forEach(ul => {
+//         const id = ul.id;
+//         const guardadas = localStorage.getItem('actividades_' + id);
+//         if (guardadas) {
+//             ul.innerHTML = '';
+//             JSON.parse(guardadas).forEach(html => {
+//                 ul.insertAdjacentHTML('beforeend', html);
+//             });
+//         }
+//     });
+//     actualizarBotonesEliminar();
+// }
+
+// Carga todas las actividades desde localStorage
 function cargarActividades() {
     document.querySelectorAll('ul').forEach(ul => {
         const id = ul.id;
         const guardadas = localStorage.getItem('actividades_' + id);
         if (guardadas) {
-            ul.querySelectorAll('li').forEach(li => li.remove());
+            ul.innerHTML = '';
             JSON.parse(guardadas).forEach(html => {
-                ul.insertAdjacentHTML('beforeend', html);
+                // Insertar el li sin botones
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = html;
+                const li = tempDiv.firstElementChild;
+                // Eliminar cualquier botón guardado accidentalmente
+                Array.from(li.querySelectorAll('button')).forEach(btn => btn.remove());
+                // Agregar botones funcionales
+                li.appendChild(crearBotonEditar(li));
+                li.appendChild(crearBotonEliminar(li));
+                ul.appendChild(li);
             });
         }
     });
 }
 
+// Guarda todas las actividades en localStorage (sin botones)
+function guardarActividades() {
+    document.querySelectorAll('ul').forEach(ul => {
+        const id = ul.id;
+        const actividades = [];
+        ul.querySelectorAll('li').forEach(li => {
+            // Clonar el li y quitar los botones antes de guardar
+            const clone = li.cloneNode(true);
+            Array.from(clone.querySelectorAll('button')).forEach(btn => btn.remove());
+            actividades.push(clone.outerHTML);
+        });
+        localStorage.setItem('actividades_' + id, JSON.stringify(actividades));
+    });
+    mostrarResumenMes();
+}
+
 // --- Menú para agregar actividades ---
+// Abre el menú para agregar una actividad
 function abrirMenuAgregar(ulId) {
     const modal = document.getElementById('modal-agregar');
     modal.innerHTML = `
         <div class="modal-content">
-            <h3>Agregar actividad</h3>
-            <button class="btn" onclick="abrirFormularioMinisterio('${ulId}')">Ministerio</button>
-            <button class="btn" onclick="abrirFormularioPersonal('${ulId}')">Personal</button>
+            <h3>¿Esta será una actividad Fija o Temporal?</h3>
+            <button class="btn" onclick="seleccionarTipoActividad('${ulId}','fija')">Fija</button>
+            <button class="btn" onclick="seleccionarTipoActividad('${ulId}','temporal')">Temporal</button>
             <button class="btn" onclick="cerrarModal()">Cancelar</button>
         </div>
     `;
     modal.classList.add('abierto');
 }
+
+// Selecciona el tipo de actividad y muestra opciones
+function seleccionarTipoActividad(ulId, tipoActividad) {
+    const modal = document.getElementById('modal-agregar');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Selecciona el tipo de actividad</h3>
+            <button class="btn" onclick="abrirFormularioActividad('${ulId}','${tipoActividad}','servicio')">Servicio</button>
+            <button class="btn" onclick="abrirFormularioActividad('${ulId}','${tipoActividad}','personal')">Personal</button>
+            <button class="btn" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    `;
+}
+
+// Abre el formulario para agregar actividad según tipo y categoría
+function abrirFormularioActividad(ulId, tipoActividad, categoria) {
+    let opciones = '';
+    if (categoria === 'servicio') {
+        opciones = `
+            <option value="">Selecciona...</option>
+            <option value="Casa en casa">Casa en casa</option>
+            <option value="Pública">Pública</option>
+            <option value="Revisita">Revisita</option>
+            <option value="C. Bíblico">C. Bíblico</option>
+        `;
+    } else {
+        opciones = `
+            <option value="">Selecciona...</option>
+            <option value="Académico">Académico</option>
+            <option value="Espiritual">Espiritual</option>
+            <option value="Familiar">Familiar</option>
+            <option value="Laboral">Laboral</option>
+            <option value="Médica">Médica</option>
+            <option value="Recreativa">Recreativa</option>
+            <option value="Social">Social</option>
+        `;
+    }
+    const modal = document.getElementById('modal-agregar');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Agregar actividad ${categoria === 'servicio' ? 'de Servicio' : 'Personal'}</h3>
+            <label>Hora (12h): <input type="time" id="hora-actividad"></label><br>
+            <label>Actividad:
+                <select id="tipo-actividad">
+                    ${opciones}
+                </select>
+            </label><br>
+            <textarea id="breve-texto" placeholder="Descripción breve"></textarea><br>
+            <label>¿Cuántas horas planea dedicar a esta actividad? <input type="number" id="horas-dedicadas" min="-99" max="99" step="0.1"></label><br>
+            <button class="btn" onclick="guardarActividad('${ulId}','${tipoActividad}','${categoria}')">Guardar</button>
+            <button class="btn" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    `;
+}
+
+// Guarda la actividad en la lista correspondiente
+function guardarActividad(ulId, tipoActividad, categoria) {
+    const hora = document.getElementById('hora-actividad').value;
+    const tipo = document.getElementById('tipo-actividad').value;
+    const texto = document.getElementById('breve-texto').value.trim();
+    const horas = parseFloat(document.getElementById('horas-dedicadas').value) || '';
+    // Formato: "HORA | Actividad > Breve texto | Horas a dedicar"
+    let contenido = '';
+    if (hora) contenido += `<span>${hora}</span> | `;
+    if (tipo) contenido += `${tipo}`;
+    if (texto) contenido += ` > ${texto}`;
+    if (horas !== '') contenido += ` | ${horas}h`;
+    // Si no hay nada, no guardar
+    if (!contenido) return;
+    const ul = document.getElementById(ulId);
+    const li = document.createElement('li');
+    li.innerHTML = contenido;
+    li.classList.add(categoria);
+    li.setAttribute('data-tipo-actividad', tipoActividad);
+    if (horas !== '') li.setAttribute('data-horas', horas);
+    // Marca si es fija o temporal
+    li.setAttribute('data-fija', tipoActividad === 'fija' ? 'true' : 'false');
+    // Botón editar y eliminar
+    li.appendChild(crearBotonEditar(li));
+    li.appendChild(crearBotonEliminar(li));
+    ul.appendChild(li);
+    guardarActividades();
+    cerrarModal();
+    actualizarBotonesEliminar();
+    ordenarActividadesPorHora(ulId);
+}
+
+// Ordena las actividades por hora
+function ordenarActividadesPorHora(ulId) {
+    const ul = document.getElementById(ulId);
+    const lis = Array.from(ul.querySelectorAll('li'));
+    lis.sort((a, b) => {
+        const horaA = (a.innerHTML.match(/<span>(.*?)<\/span>/) || [])[1] || '';
+        const horaB = (b.innerHTML.match(/<span>(.*?)<\/span>/) || [])[1] || '';
+        return horaA.localeCompare(horaB);
+    });
+    ul.innerHTML = '';
+    lis.forEach(li => ul.appendChild(li));
+}
+
+// Cierra el modal
 function cerrarModal() {
     document.getElementById('modal-agregar').classList.remove('abierto');
 }
 
-// --- Formularios de actividad ---
-function abrirFormularioMinisterio(ulId) {
-    const modal = document.getElementById('modal-agregar');
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>Ministerio</h3>
-            <label>Tipo:
-                <select id="tipo-ministerio">
-                    <option value="Casa a casa">Casa a casa</option>
-                    <option value="Pública">Pública</option>
-                    <option value="Revisita">Revisita</option>
-                </select>
-            </label><br>
-            <input type="time" id="hora-ministerio" required><br>
-            <input type="text" id="nombre-lugar" placeholder="Nombre (lugar)" required><br>
-            <textarea id="breve-texto" placeholder="Breve texto"></textarea><br>
-            <input type="number" id="horas-dedicadas" placeholder="Minutos dedicados" min="1" required><br>
-            <button class="btn" onclick="guardarMinisterio('${ulId}')">Guardar</button>
-            <button class="btn" onclick="cerrarModal()">Cancelar</button>
-        </div>
-    `;
-}
-function guardarMinisterio(ulId) {
-    const tipo = document.getElementById('tipo-ministerio').value;
-    const hora = document.getElementById('hora-ministerio').value;
-    const nombre = document.getElementById('nombre-lugar').value.trim();
-    const texto = document.getElementById('breve-texto').value.trim();
-    const minutos = parseInt(document.getElementById('horas-dedicadas').value, 10) || 0;
-    if (!hora || !nombre || minutos < 1) return alert("Completa todos los campos obligatorios.");
-    const ul = document.getElementById(ulId);
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${hora}</span> | ${nombre} (${tipo}) > ${texto}`;
-    li.setAttribute('data-tiempo', minutos);
-    ul.appendChild(li);
-    guardarActividades();
-    cerrarModal();
+// --- Botón editar y eliminar ---
+// Crea el botón de editar para una actividad
+function crearBotonEditar(li) {
+    const btn = document.createElement('button');
+    btn.textContent = 'Editar';
+    btn.className = 'btn-edit';
+    btn.onclick = function(e) {
+        e.stopPropagation();
+        editarActividad(li);
+    };
+    return btn;
 }
 
-function abrirFormularioPersonal(ulId) {
-    const modal = document.getElementById('modal-agregar');
-    modal.innerHTML = `
-        <div class="modal-content">
-            <h3>Personal</h3>
-            <input type="time" id="hora-personal" required><br>
-            <input type="text" id="nombre-lugar-personal" placeholder="Nombre (lugar)" required><br>
-            <textarea id="breve-texto-personal" placeholder="Breve texto"></textarea><br>
-            <button class="btn" onclick="guardarPersonal('${ulId}')">Guardar</button>
-            <button class="btn" onclick="cerrarModal()">Cancelar</button>
-        </div>
-    `;
-}
-function guardarPersonal(ulId) {
-    const hora = document.getElementById('hora-personal').value;
-    const nombre = document.getElementById('nombre-lugar-personal').value.trim();
-    const texto = document.getElementById('breve-texto-personal').value.trim();
-    if (!hora || !nombre) return alert("Completa todos los campos obligatorios.");
-    const ul = document.getElementById(ulId);
-    const li = document.createElement('li');
-    li.innerHTML = `<span>${hora}</span> | ${nombre} > ${texto}`;
-    ul.appendChild(li);
-    guardarActividades();
-    cerrarModal();
+// Crea el botón de eliminar para una actividad
+function crearBotonEliminar(li) {
+    const btn = document.createElement('button');
+    btn.textContent = '×';
+    btn.className = 'btn-del';
+    btn.title = 'Eliminar';
+    btn.onclick = function(e) {
+        e.stopPropagation();
+        if (confirm("¿Seguro que quieres eliminar esta actividad?")) {
+            li.remove();
+            guardarActividades();
+            actualizarBotonesEliminar();
+        }
+    };
+    return btn;
 }
 
-// --- Edición y eliminación ---
-function activarEdicion() {
+// Actualiza los botones de editar y eliminar en todas las actividades
+function actualizarBotonesEliminar() {
     document.querySelectorAll('ul').forEach(ul => {
-        let timer = null;
-        ul.addEventListener('mousedown', function(e) {
-            if (e.target.tagName === 'LI' && !e.target.classList.contains('editando')) {
-                timer = setTimeout(() => {
-                    editarActividad(e.target);
-                }, 1000); // 1 segundo
+        ul.querySelectorAll('li').forEach(li => {
+            if (!li.querySelector('.btn-del')) {
+                li.appendChild(crearBotonEliminar(li));
+            }
+            if (!li.querySelector('.btn-edit')) {
+                li.appendChild(crearBotonEditar(li));
             }
         });
-        ul.addEventListener('mouseup', function(e) { clearTimeout(timer); });
-        ul.addEventListener('mouseleave', function(e) { clearTimeout(timer); });
-        ul.addEventListener('touchstart', function(e) {
-            if (e.target.tagName === 'LI' && !e.target.classList.contains('editando')) {
-                timer = setTimeout(() => {
-                    editarActividad(e.target);
-                }, 1000);
-            }
-        });
-        ul.addEventListener('touchend', function(e) { clearTimeout(timer); });
-        ul.addEventListener('touchmove', function(e) { clearTimeout(timer); });
     });
 }
 
+// Permite editar una actividad
 function editarActividad(li) {
     li.classList.add('editando');
+    // Extrae los datos actuales
     const contenido = li.innerHTML;
-    const horaMatch = contenido.match(/<span[^>]*>(.*?)<\/span>/);
+    const horaMatch = contenido.match(/<span>(.*?)<\/span>/);
     const hora = horaMatch ? horaMatch[1] : '';
-    const textoMatch = contenido.split('|');
-    let texto = textoMatch[1] ? textoMatch[1].replace(/<.*?>/g, '').trim() : '';
-    let tiempo = li.getAttribute('data-tiempo') || '';
+    const tipoMatch = contenido.match(/\| ([^>]+)(?: >| \|)/);
+    const tipo = tipoMatch ? tipoMatch[1].trim() : '';
+    const textoMatch = contenido.match(/> ([^|]+)(?: \|)?/);
+    const texto = textoMatch ? textoMatch[1].trim() : '';
+    const horasMatch = contenido.match(/\| ([\d\.\-]+)h/);
+    const horas = horasMatch ? horasMatch[1] : '';
+    // Formulario de edición
     li.innerHTML = `
         <div class="edit-controls">
-            <input type="text" class="edit-hora" value="${hora}" style="width:4.5rem;">
-            |
-            <input type="text" class="edit-actividad" value="${texto}">
-            <input type="number" class="edit-tiempo" value="${tiempo}" min="0" placeholder="min">
+            <input type="time" class="edit-hora" value="${hora}" style="width:4.5rem;">
+            <input type="text" class="edit-tipo" value="${tipo}" placeholder="Actividad">
+            <input type="text" class="edit-texto" value="${texto}" placeholder="Descripción breve">
+            <input type="number" class="edit-horas" value="${horas}" min="-99" max="99" step="0.1" placeholder="Horas">
             <button class="btn" onclick="guardarEdicion(this)">Guardar</button>
             <button class="btn" onclick="cancelarEdicion(this)">Cancelar</button>
         </div>
     `;
 }
 
+// Guarda la edición de la actividad
 function guardarEdicion(btn) {
     const li = btn.closest('li');
     const controls = li.querySelector('.edit-controls');
     const hora = controls.querySelector('.edit-hora').value;
-    const texto = controls.querySelector('.edit-actividad').value;
-    const tiempo = controls.querySelector('.edit-tiempo').value;
-    li.innerHTML = `<span>${hora}</span> | ${texto}`;
-    if (tiempo) li.setAttribute('data-tiempo', tiempo);
-    else li.removeAttribute('data-tiempo');
+    const tipo = controls.querySelector('.edit-tipo').value;
+    const texto = controls.querySelector('.edit-texto').value;
+    const horas = controls.querySelector('.edit-horas').value;
+    let contenido = '';
+    if (hora) contenido += `<span>${hora}</span> | `;
+    if (tipo) contenido += `${tipo}`;
+    if (texto) contenido += ` > ${texto}`;
+    if (horas !== '') contenido += ` | ${horas}h`;
+    li.innerHTML = contenido;
+    if (li.classList.contains('servicio')) li.setAttribute('data-horas', horas);
     li.classList.remove('editando');
+    li.appendChild(crearBotonEditar(li));
+    li.appendChild(crearBotonEliminar(li));
     guardarActividades();
+    actualizarBotonesEliminar();
+    ordenarActividadesPorHora(li.parentElement.id);
 }
 
+// Cancela la edición y restaura la actividad
 function cancelarEdicion(btn) {
     const li = btn.closest('li');
     li.classList.remove('editando');
     cargarActividades();
+    actualizarBotonesEliminar();
 }
 
-document.querySelectorAll('ul').forEach(ul => {
-    ul.addEventListener('click', function(e) {
-        if (e.target.classList.contains('btn-del')) {
-            if (confirm("¿Seguro que quieres eliminar esta actividad?")) {
-                e.target.closest('li').remove();
-                guardarActividades();
-            }
-        }
-    });
-});
-
-function actualizarBotonesEliminar() {
-    document.querySelectorAll('ul').forEach(ul => {
-        ul.querySelectorAll('li:not(.editando)').forEach(li => {
-            if (!li.querySelector('.btn-del')) {
-                const btn = document.createElement('button');
-                btn.textContent = '×';
-                btn.className = 'btn-del';
-                btn.title = 'Eliminar';
-                btn.onclick = function(e) {
-                    e.stopPropagation();
-                    if (confirm("¿Seguro que quieres eliminar esta actividad?")) {
-                        li.remove();
-                        guardarActividades();
-                    }
-                };
-                li.appendChild(btn);
-            }
-        });
-    });
-}
-
-// --- Calcular totales ---
-function calcularTotales() {
-    let totalSemana = 0;
-    document.querySelectorAll('ul').forEach(ul => {
-        let totalDia = 0;
-        ul.querySelectorAll('li').forEach(li => {
-            const tiempo = parseFloat(li.getAttribute('data-tiempo') || '0');
-            totalDia += tiempo;
-        });
-        const totalDiv = document.getElementById('total-' + ul.id);
-        if (totalDiv) {
-            totalDiv.textContent = totalDia > 0 ? `Total día: ${formatearTiempo(totalDia)}` : '';
-        }
-        totalSemana += totalDia;
-    });
-    const totalSemanal = document.getElementById('total-semanal');
-    if (totalSemanal) {
-        totalSemanal.textContent = totalSemana > 0 ? `Total semanal: ${formatearTiempo(totalSemana)}` : '';
-    }
-    mostrarResumenMes();
-}
-
-function calcularTotalSemana() {
-    let totalSemana = 0;
-    document.querySelectorAll('ul').forEach(ul => {
-        ul.querySelectorAll('li').forEach(li => {
-            const tiempo = parseFloat(li.getAttribute('data-tiempo') || '0');
-            totalSemana += tiempo;
-        });
-    });
-    return totalSemana;
-}
-
-function formatearTiempo(minutos) {
-    const horas = Math.floor(minutos / 60);
-    const mins = Math.round(minutos % 60);
-    if (horas > 0) {
-        return `${horas}h ${mins}min`;
-    } else {
-        return `${mins}min`;
-    }
-}
-
-// --- Nuevo mes e informe ---
-function nuevoMes() {
-    const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-    if (!datos.nombre) return alert("Primero configura tu nombre y meta en 'Mi meta'.");
-    if (!confirm(`Se hará el informe de ${getMesActual()}. ¿Desea informar C.B?`)) {
-        exportarInformeCB(0);
-        limpiarMes();
-        return;
-    }
-    // Preguntar CB
-    pedirCB();
-}
-function pedirCB() {
-    const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-    const nombre = datos.nombre || '';
+// --- Actualizar horas (botón a la derecha) ---
+// Abre el formulario para actualizar horas
+function abrirFormularioActualizarHrs() {
     const modal = document.getElementById('modal-agregar');
     modal.innerHTML = `
         <div class="modal-content">
-            <div>¿Cuántos C.B informa ${nombre}? (0-99)</div>
-            <input type="number" id="input-cb" min="0" max="99" value="0">
-            <button class="btn" onclick="confirmarCB()">Aceptar</button>
+            <h3>Actualizar hrs</h3>
+            <input type="number" id="input-actualizar-hrs" placeholder="Horas (+/-)" min="-99" max="99" step="0.1">
+            <button class="btn" onclick="guardarActualizarHrs()">Guardar</button>
             <button class="btn" onclick="cerrarModal()">Cancelar</button>
         </div>
     `;
     modal.classList.add('abierto');
 }
-function confirmarCB() {
-    const cb = parseInt(document.getElementById('input-cb').value, 10) || 0;
+
+// Guarda las horas actualizadas en localStorage
+function guardarActualizarHrs() {
+    const valor = parseFloat(document.getElementById('input-actualizar-hrs').value) || 0;
+    let actual = parseFloat(localStorage.getItem('actualizar_hrs') || '0');
+    actual += valor;
+    localStorage.setItem('actualizar_hrs', actual);
+    mostrarResumenMes();
     cerrarModal();
-    exportarInformeCB(cb);
-    limpiarMes();
 }
-function exportarInformeCB(cb) {
+
+// --- Informe mensual ---
+// Abre el modal para generar el informe
+function abrirInforme() {
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-    const total = calcularTotalSemana();
-    const meta = datos.meta || 0;
+    if (!datos.nombre) return alert("Primero configura tu nombre y meta en 'Mi meta del mes'.");
+    // Pregunta si desea informar C. Bíblicos
+    const modal = document.getElementById('modal-agregar');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <div>¿Deseas informar C. Bíblicos?</div>
+            <input type="number" id="input-cb" min="0" max="99" value="0">
+            <button class="btn" onclick="generarInforme()">Continuar</button>
+            <button class="btn" onclick="cerrarModal()">Cancelar</button>
+        </div>
+    `;
+    modal.classList.add('abierto');
+}
+
+// Genera el informe y muestra opciones
+function generarInforme() {
+    const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
+    const cb = parseInt(document.getElementById('input-cb').value, 10) || 0;
     const nombre = datos.nombre || '';
+    const apellido = datos.apellido || '';
     const mes = getMesActual();
+    const año = new Date().getFullYear();
+    const tipoMeta = datos.tipo_meta;
+    const meta = datos.meta || 0;
+    const totalActualizadoHoras = parseFloat(localStorage.getItem('actualizar_hrs') || '0');
     let texto = '';
-    if (datos.tipo_meta === 'regular' || datos.tipo_meta === 'auxiliar') {
-        texto += `Nombre: ${nombre}\nMes: ${mes}\nHoras: ${Math.round(total/60)}\nC.B: ${cb}`;
+    // Si es P. Regular o Auxiliar
+    if (tipoMeta === 'regular' || tipoMeta === 'auxiliar') {
+        texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\nHoras: ${totalActualizadoHoras}\nC.B.: ${cb}`;
     } else {
-        texto += `Nombre: ${nombre}\nMes: ${mes}\nC.B: ${cb}`;
+        texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipe en una o varias facetas del servicio este mes\nC.B.: ${cb}`;
     }
-    // Descargar como .txt
-    const blob = new Blob([texto], {type: "text/plain"});
+    // Modal con opciones
+    const modal = document.getElementById('modal-agregar');
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>Informe generado</h3>
+            <textarea id="informe-txt" readonly style="width:95%;height:6em;">${texto}</textarea>
+            <button class="btn" onclick="copiarInforme()">Copiar</button>
+            <button class="btn" onclick="descargarInformeTxt()">Generar .txt</button>
+            <button class="btn" onclick="confirmarInforme()">Confirmar</button>
+            <button class="btn" onclick="cerrarModal()">Cancelar</button>
+            <div id="copiado-msg" class="copiado-msg"></div>
+        </div>
+    `;
+}
+
+// Copia el informe al portapapeles y muestra mensaje
+function copiarInforme() {
+    const informe = document.getElementById('informe-txt').value;
+    navigator.clipboard.writeText(informe).then(() => {
+        document.getElementById('copiado-msg').textContent = "Copiado";
+        setTimeout(() => {
+            document.getElementById('copiado-msg').textContent = "";
+        }, 1500);
+    });
+}
+
+// Descarga el informe como archivo .txt
+function descargarInformeTxt() {
+    const informe = document.getElementById('informe-txt').value;
+    const blob = new Blob([informe], {type: "text/plain"});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `informe_${nombre || 'usuario'}_${mes}.txt`;
+    a.download = "informe.txt";
     a.click();
     URL.revokeObjectURL(url);
-    // Compartir por WhatsApp
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(texto)}`;
-    setTimeout(() => {
-        if (confirm("¿Deseas compartir el informe por WhatsApp?")) {
-            window.open(whatsappUrl, '_blank');
-        }
-    }, 500);
 }
-function limpiarMes() {
-    Object.keys(localStorage).forEach(key => {
-        if (key.startsWith('actividades_')) localStorage.removeItem(key);
+
+// Confirma el informe y reinicia los datos según reglas
+function confirmarInforme() {
+    // Elimina actividades temporales y reinicia actualizar_hrs
+    document.querySelectorAll('ul').forEach(ul => {
+        ul.querySelectorAll('li').forEach(li => {
+            if (li.getAttribute('data-fija') !== 'true') {
+                li.remove();
+            }
+        });
     });
+    guardarActividades();
+    localStorage.setItem('actualizar_hrs', '0');
+    // Mantiene nombre y meta si es P. Regular
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-    datos.meta = 0;
-    delete datos.tipo_meta;
+    if (datos.tipo_meta !== 'regular') {
+        datos.meta = 0;
+        delete datos.tipo_meta;
+    }
     datos.mes = MESES[new Date().getMonth()];
     datos.fecha_inicio = new Date().toISOString();
     localStorage.setItem('datos_usuario', JSON.stringify(datos));
-    location.reload();
+    mostrarResumenMes();
+    cerrarModal();
+    cargarActividades();
 }
 
 // --- Inicialización ---
+// Inicializa la aplicación al cargar la página
 window.onload = function() {
     if (localStorage.getItem('modo_claro') === 'true') {
         document.body.classList.add('modo-claro');
@@ -508,33 +674,19 @@ window.onload = function() {
     mostrarMesActual();
     renderMetaForm();
     cargarActividades();
-    activarEdicion();
+    mostrarResumenMes();
     actualizarBotonesEliminar();
-    calcularTotales();
-    document.body.addEventListener('DOMSubtreeModified', actualizarBotonesEliminar);
 
-// Solo cerrar el menú si la opción NO abre un submenú
-document.querySelectorAll('.menu-opciones .menu-item').forEach(item => {
-    item.addEventListener('click', function(e) {
-        // Si la opción tiene un submenú, no cerrar
-        const submenu = this.nextElementSibling;
-        if (submenu && submenu.classList.contains('submenu')) {
-            // Solo abrir/cerrar el submenú, no cerrar el menú principal
-            return;
+    // Cierra el menú si se toca fuera
+    document.addEventListener('mousedown', function(e) {
+        const menu = document.getElementById('menu-opciones');
+        const hamburguesa = document.querySelector('.menu-hamburguesa');
+        if (
+            menu.classList.contains('abierto') &&
+            !menu.contains(e.target) &&
+            !hamburguesa.contains(e.target)
+        ) {
+            cerrarMenuOpciones();
         }
-        document.getElementById('menu-opciones').classList.remove('abierto');
     });
-});
-
-document.addEventListener('click', function(e) {
-    const menu = document.getElementById('menu-opciones');
-    const hamburguesa = document.querySelector('.menu-hamburguesa');
-    if (
-        menu.classList.contains('abierto') &&
-        !menu.contains(e.target) &&
-        !hamburguesa.contains(e.target)
-    ) {
-        menu.classList.remove('abierto');
-    }
-});
 };
