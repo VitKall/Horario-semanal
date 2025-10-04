@@ -1,3 +1,4 @@
+/* Estilos generales y variables CSS para modo claro/oscuro */
 :root {
     --fondo-oscuro: #181c24;
     --fondo-claro: #f6f7f8;
@@ -5,16 +6,16 @@
     --texto-principal: #f6f7f8;
     --h2-bg: #2d3142;
     --h2-color: #f6f7f8;
-    --ul-bg: #3aafa9;
+    --ul-bg: #02a79e;
     --btn-bg: #ffd166;
     --btn-color: #2d3142;
     --btn-add-bg: #3aafa9;
     --btn-add-color: #fff;
     --btn-del-bg: #e76f51;
     --btn-del-color: #fff;
-    --color-katy: #457b9d;
-    --color-ricky: #e76f51;
-    --color-enfasis: #f4d35e;
+    /* --color-servicio: #0a3149; */
+    --color-servicio: #034b79;
+    --color-personal: #e76f51;
     --total-tiempo: #ffd166;
     --input-bg: #fff;
     --input-color: #222;
@@ -58,6 +59,30 @@ header {
     margin: 0 1rem;
     text-align: left;
     color: var(--menu);
+}
+
+.resumen-izq {
+    text-align: left;
+}
+
+.actualizar-hrs-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 2rem;
+    margin-top: -3.95rem;
+    margin-bottom: 1.5rem;
+}
+
+.actualizar-hrs-btn {
+    /* background: #457b9d; */
+    background: #1d313d;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 8px;
+    padding: 0.5rem 0.5rem;
+    font-weight: bold;
+    margin-left: auto;
 }
 
 .menu-hamburguesa {
@@ -165,10 +190,10 @@ h1  {
 .btn-del {
     background: var(--btn-del-bg);
     color: var(--btn-del-color);
-    margin-left: 0.5rem;
-    border-radius: 50%;
-    width: 2rem;
-    height: 2rem;
+    margin-left: 1.5rem;
+    border-radius: 8px; /* Cuadrado con esquinas redondeadas */
+    width: 1.6rem;
+    height: 1.6rem;
     font-weight: bold;
     font-size: 1.1rem;
     padding: 0;
@@ -178,6 +203,16 @@ h1  {
 
 .btn-del:hover {
     background: #b63a1b;
+}
+
+.btn-edit {
+    background: #2e425e;
+    color: #f1faee;
+    border-radius: 6px;
+    margin-left: 15rem;
+    font-size: 0.95rem;
+    padding: 0.2rem 0.7rem;
+    cursor: pointer;
 }
 
 .edit-controls {
@@ -198,14 +233,6 @@ input[type="number"].edit-tiempo {
     margin-right: 0.3rem;
     background: var(--input-bg);
     color: var(--input-color);
-}
-
-select.edit-estilo, select.edit-color, select.edit-tamano, select.edit-bg {
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    padding: 0.2rem 0.5rem;
-    font-size: 1rem;
-    font-family: inherit;
 }
 
 section {
@@ -247,28 +274,18 @@ li {
     position: relative;
 }
 
+li.servicio {
+    color: var(--color-servicio);
+    font-weight: bold;
+}
+/* li.personal {
+    background: var(--color-personal);
+} */
+
 span {
     font-style: italic;
     font-size: 1.15rem;
     color: #ffe066;
-}
-
-.color-katy {
-    font-style: normal;
-    font-weight: 900;
-    color: var(--color-katy);
-}
-
-.color-ricky {
-    font-style: normal;
-    font-weight: 900;
-    color: var(--color-ricky);
-}
-
-.color-enfasis {
-    font-style: normal;
-    font-weight: 900;
-    color: var(--color-enfasis);
 }
 
 /* Modal */
@@ -305,6 +322,14 @@ span {
 }
 .modal-content button {
     margin: 0.5rem 0.3rem;
+}
+
+.copiado-msg {
+    color: green;
+    font-size: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    text-align: center;
 }
 
 @media (min-width: 600px) {
