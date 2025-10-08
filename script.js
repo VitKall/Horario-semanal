@@ -4,34 +4,6 @@ const MESES = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-// Devuelve el mes actual en texto
-function getMesActual() {
-    const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-    if (datos.mes) return datos.mes;
-    const fecha = new Date();
-    return MESES[fecha.getMonth()];
-}
-
-// Establece el mes actual en los datos del usuario
-function setMesActual(mes) {
-    const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-    datos.mes = mes;
-    datos.fecha_inicio = new Date().toISOString();
-    localStorage.setItem('datos_usuario', JSON.stringify(datos));
-}
-
-// Muestra el mes actual en el encabezado
-function mostrarMesActual() {
-    document.getElementById('mes-actual').textContent = getMesActual();
-}
-
-// --- Menú hamburguesa y submenús ---
-// --- Variables globales y utilidades de fecha/mes ---
-const MESES = [
-    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
-];
-
 // // --- Getters y setters para valores persistentes ---
 // function getHorasA2() {
 //     return Math.max(0, parseFloat(localStorage.getItem('horas_a2') || '0'));
