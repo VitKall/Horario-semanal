@@ -948,7 +948,7 @@ function generarInforme() {
         texto = `*${nombre}${apellido ? ' ' + apellido : ''}* | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\n` +
             `${detalleHoras}`;
     } else {
-        texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipe en una o varias facetas del servicio este mes\n*C. Bíblico(s).:* ${cb}`;
+        texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipé en una o varias facetas del servicio durante el mes.\n*C. Bíblico(s).:* ${cb}`;
     }
 
     const modal = document.getElementById('modal-agregar');
