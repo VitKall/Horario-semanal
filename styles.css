@@ -71,7 +71,7 @@ header {
     justify-content: flex-end;
     align-items: center;
     top: 6.3rem;
-    left: 21rem;
+    left: 82.4%;
 }
 
 .actualizar-hrs-btn {
@@ -81,7 +81,6 @@ header {
     border-radius: 8px;
     padding: 0.5rem 0.5rem;
     font-weight: bold;
-    margin-left: auto;
     margin-bottom: 0.5rem;
 }
 
