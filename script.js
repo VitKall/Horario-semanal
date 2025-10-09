@@ -357,44 +357,7 @@ function mostrarResumenMes() {
             }
         }
 
-        /* Genera el mensaje de progreso usando la lógica que ya tenías (reutiliza la función o la reimplementa aquí).
-           Para evitar duplicar lógica, recuperamos la cadena de progreso desde mostrarResumenMes (si tienes función
-           separada, úsala). Aquí reimplemento una versión compacta: */
-        function generarMensajeProgreso() {
-            const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-            const meta = datos.meta || 0;
-            let totalServicioHoras = 0;
-            document.querySelectorAll('ul').forEach(ul => {
-                ul.querySelectorAll('li.servicio').forEach(li => {
-                    const horas = parseFloat(li.getAttribute('data-horas') || '0') || 0;
-                    totalServicioHoras += horas;
-                });
-            });
-            let totalActualizadoHoras = parseFloat(localStorage.getItem('actualizar_hrs') || '0') || 0;
-            let totalA2 = getHorasA2();
-            let total = totalActualizadoHoras + totalA2;
-            let progreso = '';
-            if (meta > 0) {
-                if (total <= 0) {
-                    progreso = `Empecemos 😌: 0 hrs`;
-                } else if (total < (meta / 2)) {
-                    progreso = `¡Ya empezamos! 😊: ${total.toFixed(2)} hrs`;
-                } else if (total === (meta / 2)) {
-                    progreso = `Vas a la mitad ¡No te rindas! 🏃 ${total.toFixed(2)} hrs`;
-                } else if (total > (meta / 2) && (meta - total) > (meta / 3)) {
-                    progreso = `Estas por conquistar la meta 🏔️🧗🚩 ${total.toFixed(2)} hrs`;
-                } else if ((meta - total) <= (meta / 3) && (meta - total) > (meta / 8)) {
-                    progreso = `¡¡Ya casi!! 💪 Solo faltan: ${(meta - total).toFixed(2)} hrs`;
-                } else if ((meta - total) <= (meta / 8) && (meta - total) > 0) {
-                    progreso = `¡¡Recta final!! 🏁🔥🏁 La meta esta a: ${(meta - total).toFixed(2)} hrs`;
-                } else if (meta - total === 0) {
-                    progreso = `(: ¡Lo conseguiste! 🎇 :)`;
-                } else if (meta - total < 0) {
-                    progreso = `¡Superaste tu meta por ${Math.abs(meta - total).toFixed(2)} hrs! 😊`;
-                }
-            }
-            return progreso;
-        }
+
 
         /* Helper: invocar el resumen extendido desde el resumen principal:
            añade un botón "Ver más" en mostrarResumenMes (o al final del bloque resumen-mes)
@@ -593,11 +556,11 @@ function abrirFormularioActividad(ulId, tipoActividad, categoria) {
         opciones = `
             <option value="">Selecciona...</option>
             <option value="Académica">Académica</option>
-            <option value="Compromiso">Compromiso</option>
             <option value="Espiritual">Espiritual</option>
             <option value="Familiar">Familiar</option>
             <option value="Laboral">Laboral</option>
             <option value="Médica">Médica</option>
+            <option value="Personal">Personal</option>
             <option value="Preparar reunión">Preparar reunión 📖</option>
             <option value="Recreativa">Recreativa</option>
             <option value="Social">Social</option>
@@ -948,7 +911,7 @@ function generarInforme() {
         texto = `*${nombre}${apellido ? ' ' + apellido : ''}* | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\n` +
             `${detalleHoras}`;
     } else {
-        texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipé en una o varias facetas del servicio durante el mes.\n*C. Bíblico(s).:* ${cb}`;
+        texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipe en una o varias facetas del servicio este mes\n*C. Bíblico(s).:* ${cb}`;
     }
 
     const modal = document.getElementById('modal-agregar');
