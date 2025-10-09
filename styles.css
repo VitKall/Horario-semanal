@@ -192,6 +192,7 @@ h1  {
     background: var(--btn-add-bg);
     color: var(--btn-add-color);
     margin-top: 0.25rem;
+    margin-left: 90%;
 }
 
 .btn-add:hover {
@@ -202,7 +203,7 @@ h1  {
 .btn-del {
     background: var(--btn-del-bg);
     color: var(--btn-del-color);
-    margin-left: 1.5rem;
+    margin-left: 95%;
     border-radius: 8px; /* Cuadrado con esquinas redondeadas */
     width: 1.6rem;
     height: 1.6rem;
@@ -218,10 +219,13 @@ h1  {
 }
 
 .btn-edit {
+    display: block;
     background: #2e425e;
     color: #f1faee;
     border-radius: 6px;
-    margin-left: 15rem;
+    margin-top: 1rem;
+    margin-left: 65%;
+    margin-bottom: -8%;
     font-size: 0.95rem;
     padding: 0.2rem 0.7rem;
     cursor: pointer;
@@ -276,12 +280,14 @@ ul {
 
 li {
     color: #fff;
-    margin: 0.5rem 0;
-    padding: 0;
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+    margin: 0.8rem 0.5rem;
+    padding: 1rem;
     line-height: 1.4;
     font-size: 1.1rem;
-    background: transparent;
-    border-radius: 4px;
+    border: solid 1px rgba(0,0,0,0.1);
+    border-radius: 10px;
     transition: background 0.2s, color 0.2s;
     position: relative;
 }
@@ -351,14 +357,5 @@ span {
     }
     section {
         margin: 1rem auto;
-    }
-    ul {
-        column-count: 2;
-    }
-}
-
-@media (min-width: 900px) {
-    ul {
-        column-count: 3;
     }
 }
