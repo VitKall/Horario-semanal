@@ -593,11 +593,11 @@ function abrirFormularioActividad(ulId, tipoActividad, categoria) {
         opciones = `
             <option value="">Selecciona...</option>
             <option value="Académica">Académica</option>
+            <option value="Compromiso">Compromiso</option>
             <option value="Espiritual">Espiritual</option>
             <option value="Familiar">Familiar</option>
             <option value="Laboral">Laboral</option>
             <option value="Médica">Médica</option>
-            <option value="Personal">Personal</option>
             <option value="Preparar reunión">Preparar reunión 📖</option>
             <option value="Recreativa">Recreativa</option>
             <option value="Social">Social</option>
