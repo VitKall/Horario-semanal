@@ -4,6 +4,34 @@ const MESES = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
+// // --- Getters y setters para valores persistentes ---
+// function getHorasA2() {
+//     return Math.max(0, parseFloat(localStorage.getItem('horas_a2') || '0'));
+// }
+// function setHorasA2(valor) {
+//     localStorage.setItem('horas_a2', Math.max(0, parseFloat(valor)));
+// }
+// function getValorAnual() {
+//     let val = parseFloat(localStorage.getItem('valorAnual') || '0');
+//     if (isNaN(val)) val = 0;
+//     if (val < 0) val = 0;
+//     if (val > 600) val = 600;
+//     return val;
+// }
+// function setValorAnual(valor) {
+//     let val = parseFloat(valor);
+//     if (isNaN(val)) val = 0;
+//     if (val < 0) val = 0;
+//     if (val > 600) val = 600;
+//     localStorage.setItem('valorAnual', val);
+// }
+// function getHorasMesesAnteriores() {
+//     return Math.max(0, parseFloat(localStorage.getItem('horasMesesAnteriores') || '0'));
+// }
+// function setHorasMesesAnteriores(valor) {
+//     localStorage.setItem('horasMesesAnteriores', Math.max(0, parseFloat(valor)));
+// }
+
 function getHorasA2() {
     const v = parseFloat(localStorage.getItem('horas_a2'));
     return isNaN(v) ? 0 : Math.max(0, v);
@@ -859,6 +887,42 @@ function abrirInforme() {
     modal.classList.add('abierto');
 }
 
+// // Genera el informe y muestra opciones
+// function generarInforme() {
+//     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
+//     const cb = parseInt(document.getElementById('input-cb').value, 10) || 0;
+//     const nombre = datos.nombre || '';
+//     const apellido = datos.apellido || '';
+//     const mes = getMesActual();
+//     const año = new Date().getFullYear();
+//     const tipoMeta = datos.tipo_meta;
+//     const meta = datos.meta || 0;
+//     const totalActualizadoHoras = parseFloat(localStorage.getItem('actualizar_hrs') || '0');
+//     const totalA2 = getHorasA2();
+//     let texto = '';
+//     // Si hay horas A2, mostrar formato especial
+//     if ((tipoMeta === 'regular' || tipoMeta === 'auxiliar') && totalA2 > 0) {
+//         texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\nHoras de servicio: ${totalActualizadoHoras}\nHoras servicio A2: ${totalA2}\nTotal horas: ${totalActualizadoHoras + totalA2}\nC.B.: ${cb}`;
+//     } else if (tipoMeta === 'regular' || tipoMeta === 'auxiliar') {
+//         texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\nHoras: ${totalActualizadoHoras}\nC.B.: ${cb}`;
+//     } else {
+//         texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipe en una o varias facetas del servicio este mes\nC.B.: ${cb}`;
+//     }
+//     const modal = document.getElementById('modal-agregar');
+//     modal.innerHTML = `
+//         <div class="modal-content">
+//             <h3>Informe generado</h3>
+//             <textarea id="informe-txt" readonly style="width:95%;height:6em;">${texto}</textarea>
+//             <button class="btn" onclick="copiarInforme()">Copiar</button>
+//             <button class="btn" onclick="descargarInformeTxt()">Generar .txt</button>
+//             <button class="btn" id="btn-confirmar-informe">Confirmar</button>
+//             <button class="btn" onclick="cerrarModal()">Cancelar</button>
+//             <div id="copiado-msg" class="copiado-msg"></div>
+//         </div>
+//     `;
+//     document.getElementById('btn-confirmar-informe').onclick = confirmarInforme;
+// }
+
 // Genera el informe y muestra opciones (reemplazo con regla 55h)
 function generarInforme() {
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
@@ -923,11 +987,11 @@ function generarInforme() {
             detalleHoras += `*Nota:* se excluyeron ${a2Excluida.toFixed(2)} hrs de servicio A2 para respetar el límite de ${LIMITE_MES} hrs/mes.\n`;
         }
     }
-    if (tipoMeta === 'auxiliar') {
-        detalleHoras = `Total servicio: ${servicioNoA2.toFixed(2)}\n*C. Bíblico(s):* ${cb}\n\n`
-    } else {
-        detalleHoras = `Horas: ${(horasActualizadasNoA2 + horasA2Guardadas + horasActividadesA2).toFixed(2)}\n`;
-    }
+    else if (tipoMeta === 'auxiliar') {
+            detalleHoras = `Total servicio: ${servicioNoA2.toFixed(2)}\n*C. Bíblico(s):* ${cb}\n\n`
+        } else {
+            detalleHoras = `Horas: ${(horasActualizadasNoA2 + horasA2Guardadas + horasActividadesA2).toFixed(2)}\n`;
+        }
 
     let texto = '';
     if (tipoMeta === 'regular' || tipoMeta === 'auxiliar') {
