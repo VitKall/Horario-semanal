@@ -4,34 +4,6 @@ const MESES = [
     "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
 ];
 
-// // --- Getters y setters para valores persistentes ---
-// function getHorasA2() {
-//     return Math.max(0, parseFloat(localStorage.getItem('horas_a2') || '0'));
-// }
-// function setHorasA2(valor) {
-//     localStorage.setItem('horas_a2', Math.max(0, parseFloat(valor)));
-// }
-// function getValorAnual() {
-//     let val = parseFloat(localStorage.getItem('valorAnual') || '0');
-//     if (isNaN(val)) val = 0;
-//     if (val < 0) val = 0;
-//     if (val > 600) val = 600;
-//     return val;
-// }
-// function setValorAnual(valor) {
-//     let val = parseFloat(valor);
-//     if (isNaN(val)) val = 0;
-//     if (val < 0) val = 0;
-//     if (val > 600) val = 600;
-//     localStorage.setItem('valorAnual', val);
-// }
-// function getHorasMesesAnteriores() {
-//     return Math.max(0, parseFloat(localStorage.getItem('horasMesesAnteriores') || '0'));
-// }
-// function setHorasMesesAnteriores(valor) {
-//     localStorage.setItem('horasMesesAnteriores', Math.max(0, parseFloat(valor)));
-// }
-
 function getHorasA2() {
     const v = parseFloat(localStorage.getItem('horas_a2'));
     return isNaN(v) ? 0 : Math.max(0, v);
@@ -354,7 +326,7 @@ function mostrarResumenMes() {
     <div class="resumen-extendido-body" id="resumen-extendido-body" style="margin-top:8px;">
       <hr>
       <div> ${sem.semestreNombre}</div>
-      <div><strong>Faltan</strong> ${sem.mesesRestantes} meses incluyend este. </div>
+      <div><strong>Faltan</strong> ${sem.mesesRestantes} meses incluyendo este. </div>
       <div><strong>Haz</strong> ${sem.necesidadPorMes.toFixed(2)} hrs/mes ${sem.mesesRestantes > 0 ? 'hasta ' + (enPrimerSemestre(sem.mesActual) ? 'febrero' : 'agosto') : ''}</div>
       <hr>
       <div><strong>Horas anteriores:</strong> ${horasAtrasadas.toFixed(2)} hrs</div>
@@ -556,6 +528,8 @@ function guardarActividades() {
         localStorage.setItem('actividades_' + id, JSON.stringify(actividades));
     });
     mostrarResumenMes();
+    agregarEnlacesActividades();
+
 }
 
 // Ordena las actividades por hora
@@ -618,13 +592,16 @@ function abrirFormularioActividad(ulId, tipoActividad, categoria) {
     } else {
         opciones = `
             <option value="">Selecciona...</option>
-            <option value="Académico">Académico</option>
+            <option value="Académica">Académica</option>
             <option value="Espiritual">Espiritual</option>
             <option value="Familiar">Familiar</option>
             <option value="Laboral">Laboral</option>
             <option value="Médica">Médica</option>
+            <option value="Personal">Personal</option>
+            <option value="Preparar reunión">Preparar reunión 📖</option>
             <option value="Recreativa">Recreativa</option>
             <option value="Social">Social</option>
+            <option value="Social">Viaje</option>
         `;
     }
     const modal = document.getElementById('modal-agregar');
@@ -673,6 +650,16 @@ function guardarActividad(ulId, tipoActividad, categoria) {
     ordenarActividadesPorHora(ulId);
 }
 
+// Si el usuario selecciona "Preparar reunión", abrir el enlace automáticamente
+document.addEventListener("change", function (e) {
+    if (e.target && e.target.id === "tipo-actividad") {
+        const selected = e.target.selectedOptions[0];
+        const link = selected.getAttribute("data-link");
+        if (link) {
+            window.open(link, "_blank");
+        }
+    }
+});
 
 // --- Actualizar horas (botón a la derecha) ---
 function abrirFormularioActualizarHrs() {
@@ -852,7 +839,6 @@ function guardarEdicion(btn) {
     if (texto) contenido += ` > ${texto}`;
     if (horas !== '') contenido += ` | ${horas}h`;
     li.innerHTML = contenido;
-    // actualizar atributo data-horas y data-tipo
     if (li.classList.contains('servicio')) li.setAttribute('data-horas', horas);
     if (tipo) li.setAttribute('data-tipo', tipo);
     else li.removeAttribute('data-tipo');
@@ -886,42 +872,6 @@ function abrirInforme() {
     `;
     modal.classList.add('abierto');
 }
-
-// // Genera el informe y muestra opciones
-// function generarInforme() {
-//     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
-//     const cb = parseInt(document.getElementById('input-cb').value, 10) || 0;
-//     const nombre = datos.nombre || '';
-//     const apellido = datos.apellido || '';
-//     const mes = getMesActual();
-//     const año = new Date().getFullYear();
-//     const tipoMeta = datos.tipo_meta;
-//     const meta = datos.meta || 0;
-//     const totalActualizadoHoras = parseFloat(localStorage.getItem('actualizar_hrs') || '0');
-//     const totalA2 = getHorasA2();
-//     let texto = '';
-//     // Si hay horas A2, mostrar formato especial
-//     if ((tipoMeta === 'regular' || tipoMeta === 'auxiliar') && totalA2 > 0) {
-//         texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\nHoras de servicio: ${totalActualizadoHoras}\nHoras servicio A2: ${totalA2}\nTotal horas: ${totalActualizadoHoras + totalA2}\nC.B.: ${cb}`;
-//     } else if (tipoMeta === 'regular' || tipoMeta === 'auxiliar') {
-//         texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\nHoras: ${totalActualizadoHoras}\nC.B.: ${cb}`;
-//     } else {
-//         texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipe en una o varias facetas del servicio este mes\nC.B.: ${cb}`;
-//     }
-//     const modal = document.getElementById('modal-agregar');
-//     modal.innerHTML = `
-//         <div class="modal-content">
-//             <h3>Informe generado</h3>
-//             <textarea id="informe-txt" readonly style="width:95%;height:6em;">${texto}</textarea>
-//             <button class="btn" onclick="copiarInforme()">Copiar</button>
-//             <button class="btn" onclick="descargarInformeTxt()">Generar .txt</button>
-//             <button class="btn" id="btn-confirmar-informe">Confirmar</button>
-//             <button class="btn" onclick="cerrarModal()">Cancelar</button>
-//             <div id="copiado-msg" class="copiado-msg"></div>
-//         </div>
-//     `;
-//     document.getElementById('btn-confirmar-informe').onclick = confirmarInforme;
-// }
 
 // Genera el informe y muestra opciones (reemplazo con regla 55h)
 function generarInforme() {
@@ -980,22 +930,22 @@ function generarInforme() {
     if (tipoMeta === 'regular') {
         detalleHoras = `\nServicio del campo: ${servicioNoA2.toFixed(2)}\n` +
             `Servicio A2: ${a2Contada.toFixed(2)}\n` +
-            `*Total* hrs de servicio: ${totalEfectivo.toFixed(2)}\n` +
+            `*TOTAL:* ${totalEfectivo.toFixed(2)}\n` +
             `*C. Bíblico(s):* ${cb}\n\n`;
 
         if (a2Excluida > 0) {
-            detalleHoras += `*Nota:* se excluyeron ${a2Excluida.toFixed(2)} hrs de servicio A2 para respetar el límite de ${LIMITE_MES} hrs/mes.\n`;
+            detalleHoras += `*_Nota:_* se excluyeron ${a2Excluida.toFixed(2)} hrs de servicio A2 para respetar el límite de ${LIMITE_MES} hrs/mes.\n`;
         }
     }
     else if (tipoMeta === 'auxiliar') {
-            detalleHoras = `Total servicio: ${servicioNoA2.toFixed(2)}\n*C. Bíblico(s):* ${cb}\n\n`
+            detalleHoras = `_Total servicio:_ ${servicioNoA2.toFixed(2)}\n*C. Bíblico(s):* ${cb}\n\n`
         } else {
             detalleHoras = `Horas: ${(horasActualizadasNoA2 + horasA2Guardadas + horasActividadesA2).toFixed(2)}\n`;
         }
 
     let texto = '';
     if (tipoMeta === 'regular' || tipoMeta === 'auxiliar') {
-        texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\n` +
+        texto = `*${nombre}${apellido ? ' ' + apellido : ''}* | ${mes} ${año} | ${mostrarTipoMeta(tipoMeta)}\n` +
             `${detalleHoras}`;
     } else {
         texto = `${nombre}${apellido ? ' ' + apellido : ''} | ${mes} ${año}\nParticipe en una o varias facetas del servicio este mes\n*C. Bíblico(s).:* ${cb}`;
@@ -1072,6 +1022,37 @@ function confirmarInforme() {
     cerrarModal();
 }
 
+// --- Enlaces invisibles para actividades específicas ---
+function agregarEnlacesActividades() {
+    document.querySelectorAll('li.personal').forEach(li => {
+        const texto = (li.textContent || '').toLowerCase();
+
+        // Si ya tiene configurado un enlace, saltar
+        if (li.dataset.linkReady === "true") return;
+
+        // Preparar reunión
+        if (texto.includes('preparar reunión')) {
+            li.dataset.enlace = "https://jw.org/finder?srcid=jwlshare&alias=meetings&date=00000000&wtlocale=S";
+            li.dataset.linkReady = "true";
+        }
+    });
+}
+
+// --- Detectar clic en actividades con enlace ---
+document.addEventListener('click', function (e) {
+    // Ignora si el clic fue en los botones de editar o eliminar
+    if (e.target.closest('button')) return;
+
+    const li = e.target.closest('li.personal');
+    if (!li) return;
+
+    const link = li.dataset.enlace;
+    if (link) {
+        window.open(link, '_blank');
+    }
+});
+
+
 // --- Inicialización ---
 window.onload = function () {
     if (localStorage.getItem('modo_claro') === 'true') {
@@ -1082,6 +1063,7 @@ window.onload = function () {
     cargarActividades();
     mostrarResumenMes();
     actualizarBotonesEliminar();
+    agregarEnlacesActividades();
 
     document.addEventListener('mousedown', function (e) {
         const menu = document.getElementById('menu-opciones');
