@@ -213,7 +213,7 @@ function mostrarResumenMes() {
         } else if (total === (meta / 2)) {
             progreso = `Vas a la mitad 🏃 ¡No te rindas!`;
         } else if (total > (meta / 2) && faltan > (meta / 3)) {
-            progreso = `A ${total.toFixed(2)} hrs de conquistar la 🏔️🚩`;
+            progreso = `A ${faltan} hrs de conquistar la 🏔️🚩`;
         } else if (faltan <= (meta / 3) && faltan > (meta / 8)) {
             progreso = `¡¡Ya casi!! 💪 Solo faltan: ${faltan.toFixed(2)} hrs`;
         } else if (faltan <= (meta / 8) && faltan > 0) {
@@ -330,7 +330,9 @@ function mostrarResumenMes() {
       <div><strong>Haz</strong> ${sem.necesidadPorMes.toFixed(2)} hrs/mes ${sem.mesesRestantes > 0 ? 'hasta ' + (enPrimerSemestre(sem.mesActual) ? 'febrero' : 'agosto') : ''}</div>
       <hr>
       <div><strong>Horas anteriores:</strong> ${horasAtrasadas.toFixed(2)} hrs</div>
-      <div><strong>Acumulado total:</strong> ${(horasAtrasadas + horasActualizadas).toFixed(2)} hrs</div>
+      <div><strong>Servicio del campo:</strong> ${(horasActualizadas).toFixed(2)} hrs</div>
+      <div><strong>Servicio A2:</strong> ${horasA2} hrs</div>
+      <div><strong>Total mes:</strong> ${(horasA2 + horasActualizadas).toFixed(2)} hrs</div>
       <hr>
     </div>
   `;
