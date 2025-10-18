@@ -191,6 +191,24 @@ function reiniciarMetaAnual() {
 function mostrarResumenMes() {
     const datos = JSON.parse(localStorage.getItem('datos_usuario') || '{}');
     const meta = datos.meta || 0;
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    // --- Corrección de meta y horas según tipo de meta ---
+    let metaFinal = meta;
+    let totalA2 = 0;
+
+    // Si el tipo de meta es Regular o Auxiliar, sí usamos las horas A2
+    if (['regular', 'auxiliar'].includes(datos.tipo_meta)) {
+        totalA2 = getHorasA2();
+    }
+
+    // Si meta no existe (por otros tipos), intentar leer meta_mensual general
+    if (!metaFinal || metaFinal <= 0) {
+        const metaLocal = parseFloat(localStorage.getItem('meta_mensual') || '0');
+        metaFinal = metaLocal > 0 ? metaLocal : 0;
+    }
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    //+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
     const nombre = datos.nombre || '';
     const apellido = datos.apellido || '';
     let totalServicioHoras = 0;
@@ -201,11 +219,14 @@ function mostrarResumenMes() {
         });
     });
     let totalActualizadoHoras = parseFloat(localStorage.getItem('actualizar_hrs') || '0');
-    let totalA2 = getHorasA2();
+    // totalA2 = getHorasA2();
     let total = totalActualizadoHoras + totalA2;
-    let faltan = meta - total;
+    // let faltan = meta - total;
+    let faltan = metaFinal - total;
+
     let progreso = '';
-    if (meta > 0) {
+    // if (meta > 0) {
+    if (metaFinal > 0) {
         if (total <= 0) {
             progreso = `Empecemos 😌: 0 hrs`;
         } else if (total < (meta / 2)) {
@@ -335,6 +356,9 @@ function mostrarResumenMes() {
       <div><strong>Total mes:</strong> ${(horasA2 + horasActualizadas).toFixed(2)} hrs</div>
       <hr>
     </div>
+    <div id="ultimo-registro" style="margin-top:0.3rem;"></div>
+    <button class="btn-ver-registro" onclick="mostrarRegistrosMes()">Ver registro del mes</button>
+    <button class="btn-borrar-registro" onclick="reiniciarHistorial()">Reiniciar historial</button>
   `;
 
             // replace / open
@@ -401,14 +425,29 @@ function mostrarResumenMes() {
         if (restanteAnual < 0) restanteAnual = 0;
         // resumenAnual = `<strong>Meta anual:</strong> 600 hrs<br><strong>Acumulado:</strong> ${valorAnual.toFixed(2)} hrs<br><strong>Faltan:</strong> ${restanteAnual.toFixed(2)} hrs`;
     }
-    document.getElementById('resumen-mes').innerHTML = `
+
+    const contenedorResumen = document.getElementById('resumen-mes');
+    contenedorResumen.innerHTML = `
         ${nombre}${apellido ? ' ' + apellido : ''}, así vas:<br>
         ${resumenAnual}
         Meta mensual: ${meta > 0 ? meta + ' hrs' : 'Establece tu meta'}<br>
         Meta semanal: ${totalServicioHoras} hrs<br>
         ${progreso}
     `;
+
+    // document.getElementById('resumen-mes').innerHTML = `
+    //     ${nombre}${apellido ? ' ' + apellido : ''}, así vas:<br>
+    //     ${resumenAnual}
+    //     Meta mensual: ${meta > 0 ? meta + ' hrs' : 'Establece tu meta'}<br>
+    //     Meta semanal: ${totalServicioHoras} hrs<br>
+    //     ${progreso}
+    //     <div id="ultimo-registro"></div>
+    //     <button class="btn-ver-registro" onclick="mostrarRegistrosMes()">Ver registro del mes</button>
+    // `;
+
     insertarBotonResumenExtendido();
+    mostrarUltimoRegistro();
+
 }
 
 // --- Copia de seguridad ---
@@ -651,8 +690,7 @@ function abrirFormularioActualizarHrs() {
     `;
     modal.classList.add('abierto');
     document.getElementById('btn-aceptar-hrs').onclick = guardarActualizarHrs;
-    document.getElementById('btn-cancelar-hrs').onclick = cerrarModal;
-}
+    document.getElementById('btn-cancelar-hrs').onclick = cerrarModal;}
 
 // Convierte "2:30" a 2.5 horas, o devuelve el número si es decimal
 function convertirHoras(valor) {
@@ -692,8 +730,19 @@ function guardarActualizarHrs() {
         let nuevoValor = getValorAnual() + valor;
         setValorAnual(nuevoValor); // SOLO sumar el valor ingresado y limitar entre 0 y 600
     }
-    mostrarResumenMes();
+    // -------------------------------------------------------------------------------------
+    // Guardar fecha del registro
+    // -------------------------------------------------------------------------------------
+    const registros = JSON.parse(localStorage.getItem('registros_mes') || '[]');
+    const fecha = new Date();
+    const opciones = { day: 'numeric', month: 'long' };
+    const fechaTexto = fecha.toLocaleDateString('es-ES', opciones);
+    registros.push({ fecha: fechaTexto, horas: valor });
+    localStorage.setItem('registros_mes', JSON.stringify(registros));
+    // -------------------------------------------------------------------------------------
+    // -------------------------------------------------------------------------------------
     cerrarModal();
+    mostrarResumenMes();
 }
 
 // --- Horas meses anteriores ---
@@ -982,6 +1031,8 @@ function confirmarInforme() {
     datos.mes = MESES[new Date().getMonth()];
     datos.fecha_inicio = new Date().toISOString();
     localStorage.setItem('datos_usuario', JSON.stringify(datos));
+    // Reiniciar historial mensual al iniciar un nuevo mes
+    localStorage.removeItem('registros_mes');
     mostrarResumenMes();
     cargarActividades();
     cerrarModal();
@@ -1041,4 +1092,53 @@ window.onload = function () {
             cerrarMenuOpciones();
         }
     });
+}
+
+    //-----------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------
+    function mostrarUltimoRegistro() {
+        const registros = JSON.parse(localStorage.getItem('registros_mes') || '[]');
+        const div = document.getElementById('ultimo-registro');
+        if (!div) return;
+        if (registros.length === 0) {
+            div.textContent = 'Sin registros este mes.';
+        } else {
+            const ultimo = registros[registros.length - 1];
+            div.textContent = `Último registro: ${ultimo.fecha}`;
+        }
+    }
+
+    function mostrarRegistrosMes() {
+        const registros = JSON.parse(localStorage.getItem('registros_mes') || '[]');
+        const modal = document.getElementById('modal-agregar');
+        if (registros.length === 0) {
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <h3>No hay registros este mes.</h3>
+                    <button class="btn" onclick="cerrarModal()">Cerrar</button>
+                </div>
+            `;
+        } else {
+            let html = '<h3>Registro del mes</h3>';
+            registros.forEach(r => {
+                html += `<div>${r.fecha} = ${r.horas} hrs</div>`;
+            });
+            html += `<button class="btn" onclick="cerrarModal()">Cerrar</button>`;
+            modal.innerHTML = `<div class="modal-content">${html}</div>`;
+        }
+        modal.classList.add('abierto');
+    }
+
+    // --- Reiniciar historial del mes ---
+function reiniciarHistorial() {
+    if (confirm("¿Seguro que deseas borrar todos los registros del mes actual?")) {
+        localStorage.removeItem('registros_mes');
+        mostrarResumenMes();
+        alert("✅ Historial del mes borrado correctamente.");
+    }
 };
+
+
+//-----------------------------------------------------------------------------------------------------
+//-----------------------------------------------------------------------------------------------------
+
