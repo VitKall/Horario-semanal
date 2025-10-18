@@ -213,7 +213,7 @@ function mostrarResumenMes() {
         } else if (total === (meta / 2)) {
             progreso = `Vas a la mitad 🏃 ¡No te rindas!`;
         } else if (total > (meta / 2) && faltan > (meta / 3)) {
-            progreso = `A ${faltan} hrs de conquistar la 🏔️🚩`;
+            progreso = `A ${faltan.toFixed(2)} hrs de conquistar la 🏔️🚩`;
         } else if (faltan <= (meta / 3) && faltan > (meta / 8)) {
             progreso = `¡¡Ya casi!! 💪 Solo faltan: ${faltan.toFixed(2)} hrs`;
         } else if (faltan <= (meta / 8) && faltan > 0) {
