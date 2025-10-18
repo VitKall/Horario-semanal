@@ -251,6 +251,40 @@ input[type="number"].edit-tiempo {
     color: var(--input-color);
 }
 
+/* --------------------------------- */
+/* --------------------------------- */
+.btn-ver-registro {
+    display: block;
+    background: #2e425e;
+    color: #fff;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    font-weight: bold;
+    margin-top: 0.3rem;
+}
+.btn-ver-registro:hover {
+    background: #3aafa9;
+}
+
+.btn-borrar-registro {
+    display: block;
+    background: #b63a1b;
+    color: #fff;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    font-weight: bold;
+    margin-top: 0.3rem;
+}
+.btn-borrar-registro:hover {
+    background: #e76f51;
+}
+
+/* --------------------------------- */
+/* --------------------------------- */
+
+
 section {
     margin: 1rem 0.5rem;
 }
